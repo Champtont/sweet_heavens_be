@@ -1,4 +1,5 @@
 # sweet_heavens_be
+
 backend for sweet heavens web page
 
 user needs
@@ -11,4 +12,5 @@ admin needs
 -authorized access to be
 -receive orders
 -track fullfilled orders
+-ability to alter whether product is in stock or hidden
 -create, edit, remove product photos and/or descriptions
