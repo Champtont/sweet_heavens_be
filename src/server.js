@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
-
+import passport from "passport";
+import googleStrategy from "./lib/auth/google.js";
 import {
   badRequestHandler,
   genericErrorHandler,
@@ -9,9 +10,12 @@ import {
 
 const server = express();
 
+passport.use("google", googleStrategy);
+
 // * MIDDLEWARES *
 server.use(cors());
 server.use(express.json());
+server.use(passport.initialize());
 
 // **** ENDPOINTS ****
 //server.use("/users", usersRouter);
