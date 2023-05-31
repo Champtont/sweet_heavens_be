@@ -10,11 +10,73 @@ import { JWTAuthMiddleware } from "../../lib/auth/jwtAuth.js";
 import { createAccessToken } from "../../lib/auth/tools.js";
 import UsersModel from "./model.js";
 
+const usersRouter = express.Router();
+
 //***USER ENDPOINTS*** */
 //Register
+usersRouter.post("/register", async (req, res, next) => {
+  try {
+    const newUser = new UsersModel(req.body);
+    const { _id } = await newUser.save();
+    if ({ _id }) {
+      const payload = { _id: newUser._id, role: newUser.role };
+      const accessToken = await createAccessToken(payload);
+      res.send({ accessToken });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 //Google Endpoints
+
+usersRouter.get(
+  "/googleLogin",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+usersRouter.get(
+  "/googleRedirect",
+  passport.authenticate("google", { session: false }),
+  async (req, res, next) => {
+    console.log(req.user);
+    res.redirect(`${process.env.FE_URL}/${req.user.accessToken}`);
+  }
+);
+
 //Login
+
+usersRouter.post("/login", async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await UsersModel.checkCredentials(email, password);
+
+    if (user) {
+      const payload = { _id: user._id, role: user.role };
+
+      const accessToken = await createAccessToken(payload);
+      res.send({ accessToken });
+    } else {
+      next(createHttpError(401, "Credentials are not ok!"));
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 //Logout
+
+usersRouter.get("/logout", JWTAuthMiddleware, async (req, res, next) => {
+  try {
+    const user = await UsersModel.findById(req.user._id);
+    res.clearCookie("jwt");
+    await user.save();
+    res.status(200).send({ message: "You're logged out" });
+  } catch (error) {
+    next(error);
+  }
+});
+
 //Get my info
 //Edit my info
 //Edit my profile pic
