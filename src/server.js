@@ -1,12 +1,13 @@
 import express from "express";
 import cors from "cors";
 import passport from "passport";
-import googleStrategy from "./lib/auth/google.js";
+import googleStrategy from "./lib/google.js";
 import {
   badRequestHandler,
   genericErrorHandler,
   notFoundHandler,
 } from "./errorHandlers.js";
+import usersRouter from "./api/users/index.js";
 
 const server = express();
 
@@ -18,7 +19,7 @@ server.use(express.json());
 server.use(passport.initialize());
 
 // **** ENDPOINTS ****
-//server.use("/users", usersRouter);
+server.use("/users", usersRouter);
 //server.use("/recipes", recipesRouter);
 
 // ** ERROR HANDLERS **
